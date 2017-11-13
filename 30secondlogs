@@ -1,0 +1,60 @@
+unload
+
+('WITH l_15 AS (SELECT DISTINCT creative_id
+              FROM spend_log
+                -- This is the list of creatives that are 15 seconds
+                WHERE creative_name IN (
+                  \'bundle-126-2017-10-06T1953.zip\',
+                  \'bundle-129-2017-10-06T1953.zip\',
+                  \'129_free_Sling_URL_Bottom(15).zip\',
+                  \'126_college_Sling_SMS_Top(15).zip\'
+                )
+              )
+SELECT
+  1 AS query,
+  DATEADD(SEC, -15, convert(TIMESTAMP, syslog_timestamp_utc)) AS start_dt_est,
+  address,
+  partner_venue_id,
+  latitude,
+  longitude,
+  campaign_id,
+  creative_id,
+  impressions
+FROM sling_server_logs_from_vistar2
+WHERE creative_id IN (SELECT * FROM l_15)
+
+UNION
+
+SELECT
+  2 AS query,
+  DATEADD(SEC, -15, convert(TIMESTAMP, syslog_timestamp_utc)) AS start_dt_est,
+  address,
+  partner_venue_id,
+  latitude,
+  longitude,
+  campaign_id,
+  creative_id,
+  impressions
+FROM sling_server_logs_from_vistar2
+WHERE creative_id NOT IN (SELECT * FROM l_15)
+
+UNION
+
+SELECT
+  3 AS query,
+  DATEADD(SEC, -30, convert(TIMESTAMP, syslog_timestamp_utc)) AS start_dt_est,
+  address,
+  partner_venue_id,
+  latitude,
+  longitude,
+  campaign_id,
+  creative_id,
+  impressions
+FROM sling_server_logs_from_vistar2
+WHERE creative_id NOT IN (SELECT * FROM l_15)')
+
+to 's3://dataeng-data-exports/extracts/vistar/SlingV2'
+
+iam_role 'arn:aws:iam::313152642372:role/Redshift-Read-S3'
+
+maxfilesize 500 mb
