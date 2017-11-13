@@ -1,0 +1,10 @@
+unload ('SELECT campaign_name, timestamp \'epoch\' + display_time * interval \'1 second\' as timestamp, partner_venue_name, partner_venue_id, latitude, longitude, campaign_id, creative_id, impressions
+FROM spend_log
+
+WHERE campaign_name in (\'Bed,Bath&Beyond_9.18.17_prog\', \'BedBathandBeyond_PhotoRequest_9.18.17\', \'Bed,Bath&Beyond_9.19.17_Smoketest\', \'Bed,Bath&Beyond_9.18.17\', \'BedBathBeyond&Netflix&ProjectEveryone_9.20.17\')')
+
+to 's3://dataeng-data-exports/extracts/vistar/BBB' 
+
+iam_role 'arn:aws:iam::313152642372:role/Redshift-Read-S3'
+
+maxfilesize 100 mb
