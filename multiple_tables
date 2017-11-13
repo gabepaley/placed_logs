@@ -1,0 +1,35 @@
+-- logs from multiple tables
+
+unload
+
+('select
+CONVERT(timestamp,syslog_timestamp_utc) - interval \'15 second\' as starttime_utc,
+syslog_timestamp_utc as endtime_utc,
+address,
+partner_venue_id,
+latitude,
+longitude,
+campaign_id,
+creative_id,
+impressions
+from warby_cta_server_logs_from_vistar2
+
+UNION
+
+select
+CONVERT(timestamp,syslog_timestamp_utc) - interval \'15 second\' as starttime_utc,
+syslog_timestamp_utc as endtime_utc,
+address,
+partner_venue_id,
+latitude,
+longitude,
+campaign_id,
+creative_id,
+impressions
+from warby_locationspecific_server_logs_from_vistar2')
+
+to 's3://dataeng-data-exports/extracts/vistar/WarbyV2'
+
+iam_role 'arn:aws:iam::313152642372:role/Redshift-Read-S3'
+
+maxfilesize 500 mb
